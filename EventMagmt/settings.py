@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-)@!o40u8n%wpeb-sealsiv$$ycl7k+y3-@6ckzqq3qt7uyyp1!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["bindueluri06.pythonanywhere.com"]
+#ALLOWED_HOSTS = ["bindueluri06.pythonanywhere.com"]
 
 
 
@@ -78,14 +78,14 @@ WSGI_APPLICATION = 'EventMagmt.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': 'events',
-        # 'USER': 'postgres',
-        # 'PASSWORD': 'bindu',
-        # 'HOST': 'localhost',
-        # 'PORT': '5432',
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'events',
+        'USER': 'postgres',
+        'PASSWORD': 'bindu',
+        'HOST': 'localhost',
+        'PORT': '5432',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
