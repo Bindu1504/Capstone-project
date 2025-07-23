@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment - EventFlow{% endblock %}
+
+{% block content %}
+<div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="row justify-content-center w-100">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="mb-4 text-center">Payment Details</h2>
+          <p class="mb-3">Booking for: <strong>{{ booking.ticket.event.title }}</strong></p>
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Select Payment Method</label>
+              <select name="payment_method" class="form-select" id="payment-method-select" required>
+                <option value="">Choose...</option>
+                <option value="upi">UPI</option>
+                <option value="card">Credit/Debit Card</option>
+                <option value="netbanking">Net Banking</option>
+              </select>
+            </div>
+            <div id="upi-fields" class="mb-3" style="display:none;">
+              <label class="form-label fw-semibold">UPI ID</label>
+              <input type="text" name="upi_id" class="form-control" placeholder="Enter UPI ID">
+            </div>
+            <div id="card-fields" style="display:none;">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Card Number</label>
+                <input type="password" name="card_number" class="form-control" placeholder="Card Number" maxlength="16" pattern="\d{16}" autocomplete="cc-number">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Expiry Date</label>
+                <input type="text" name="expiry_date" class="form-control" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])\/\d{2}" title="Format: MM/YY" autocomplete="cc-exp" inputmode="numeric">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">CVV</label>
+                <input type="password" name="cvv" class="form-control" placeholder="CVV" maxlength="4" pattern="\d{3,4}" autocomplete="cc-csc">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Card Owner Name</label>
+                <input type="text" name="card_owner" class="form-control" placeholder="Card Owner Name" autocomplete="cc-name" pattern="[A-Za-z]+" title="Only alphabets allowed">
+              </div>
+            </div>
+            <div id="netbanking-fields" class="mb-3" style="display:none;">
+              <label class="form-label fw-semibold">Bank Name</label>
+              <input type="text" name="bank_name" class="form-control" placeholder="Enter Bank Name">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Pay & Book</button>
+          </form>
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              const paymentSelect = document.getElementById('payment-method-select');
+              const upiFields = document.getElementById('upi-fields');
+              const cardFields = document.getElementById('card-fields');
+              const netbankingFields = document.getElementById('netbanking-fields');
+              paymentSelect.addEventListener('change', function() {
+                upiFields.style.display = 'none';
+                cardFields.style.display = 'none';
+                netbankingFields.style.display = 'none';
+                if (this.value === 'upi') {
+                  upiFields.style.display = 'block';
+                } else if (this.value === 'card') {
+                  cardFields.style.display = 'block';
+                } else if (this.value === 'netbanking') {
+                  netbankingFields.style.display = 'block';
+                }
+              });
+
+              // Expiry date auto-format MM/YY
+              const expiryInput = document.querySelector('input[name="expiry_date"]');
+              if (expiryInput) {
+                expiryInput.addEventListener('input', function(e) {
+                  let value = this.value.replace(/[^0-9]/g, '');
+                  if (value.length > 2) {
+                    value = value.slice(0,2) + '/' + value.slice(2,4);
+                  }
+                  this.value = value.slice(0,5);
+                });
+              }
+
+              // Card Owner Name: only allow letters
+              const ownerInput = document.querySelector('input[name="card_owner"]');
+              if (ownerInput) {
+                ownerInput.addEventListener('input', function(e) {
+                  this.value = this.value.replace(/[^A-Za-z]/g, '');
+                });
+              }
+            });
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

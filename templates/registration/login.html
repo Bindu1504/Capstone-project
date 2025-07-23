@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex min-vh-100">
+  <!-- Left 60% with background image -->
+  <div style="
+      width: 60%;
+      background-image: url('{% static 'images/background_image.png' %}');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;">
+  </div>
+
+  <!-- Right 40% with login form centered -->
+  <div style="width: 40%; display: flex; align-items: center; justify-content: center; background-color: #fff;">
+    <div style="width: 100%; max-width: 500px;" class="px-4">
+      <div class="bg-white p-5 shadow-lg border border-2 rounded-4">
+        <h2 class="mb-4 fs-2 text-center fw-bold">Login</h2>
+        {% if form.errors %}
+          <p class="text-danger text-center">Invalid username or password.</p>
+        {% endif %}
+        <form method="post" class="w-100">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="id_username" class="form-label fs-5 fw-bold">Username:</label>
+            <input type="text" name="username" class="form-control form-control-lg rounded-3" id="id_username" required>
+          </div>
+          <div class="mb-3">
+            <label for="id_password" class="form-label fs-5 fw-bold">Password:</label>
+            <input type="password" name="password" class="form-control form-control-lg rounded-3" id="id_password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  const btn = form.querySelector('button[type="submit"]');
+  form.addEventListener('submit', function() {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Logging in...';
+  });
+});
+</script>
+{% endblock %}

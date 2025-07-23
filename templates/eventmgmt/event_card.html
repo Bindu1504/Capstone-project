@@ -1,0 +1,156 @@
+{% load static %}
+
+<div class="card h-100 shadow-sm event-card border border-black" style="border-width:2px !important;">
+    <div class="position-relative overflow-hidden">
+        <img src="{% if event.image %}{{ event.image.url }}{% else %}https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800{% endif %}"
+             class="card-img-top" alt="{{ event.title }}"
+             style="height: 220px; object-fit: cover; transition: transform 0.3s ease;">
+
+        <!-- Featured Badge -->
+        {% if event.featured %}
+            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 px-3 py-2">
+                <i class="fas fa-star me-1"></i>Featured
+            </span>
+        {% endif %}
+
+        <!-- Category Badge -->
+{#        <span class="badge bg-danger position-absolute top-0 end-0 m-3 px-3 py-2">#}
+{#            {{ event.get_category_display }}#}
+{#        </span>#}
+
+        <!-- Status Badge -->
+        {% if event.status != 'Active' %}
+            <span class="badge bg-secondary position-absolute" style="top: 3rem; right: 1rem;">
+                {{ event.status }}
+            </span>
+        {% endif %}
+
+        <!-- Availability Alert -->
+        {% if event.is_almost_full and not event.is_sold_out %}
+            <div class="position-absolute bottom-0 start-0 end-0 m-3">
+                <div class="alert alert-warning mb-0 py-2 px-3 border-0 shadow-sm">
+                    <small class="fw-semibold">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        Only {{ event.available_spots }} spots left!
+                    </small>
+                </div>
+            </div>
+        {% elif event.is_sold_out %}
+            <div class="position-absolute bottom-0 start-0 end-0 m-3">
+                <div class="alert alert-danger mb-0 py-2 px-3 border-0 shadow-sm">
+                    <small class="fw-semibold">
+                        <i class="fas fa-ban me-1"></i>
+                        Sold Out
+                    </small>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Hover Overlay -->
+        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-0 d-flex align-items-center justify-content-center"
+             style="transition: opacity 0.3s ease;">
+            <a href="{% url 'event_detail' event.pk %}" class="btn btn-light btn-lg">
+                <i class="fas fa-eye me-2"></i>View Details
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body d-flex flex-column p-4">
+        <h5 class="card-title fw-bold mb-3 text-dark">{{ event.title }}</h5>
+        <p class="card-text text-muted flex-grow-1 mb-3">{{ event.description|truncatewords:18 }}</p>
+
+        <div class="event-details mb-4">
+            <div class="row g-2">
+                <div class="col-6">
+                    <div class="d-flex align-items-center text-muted mb-2">
+                        <i class="fas fa-calendar text-primary me-2"></i>
+                        <small>{{ event.date|date:"M j, Y" }}</small>
+                    </div>
+                    <div class="d-flex align-items-center text-muted mb-2">
+                        <i class="fas fa-clock text-primary me-2"></i>
+                        <small>{{ event.time|time:"g:i A" }}</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="d-flex align-items-center text-muted mb-2">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        <small>{{ event.location|truncatechars:20 }}</small>
+                    </div>
+                    <div class="d-flex align-items-center text-muted mb-2">
+                        <i class="fas fa-user text-primary me-2"></i>
+                        <small>{{ event.organizer_name|truncatechars:15 }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Capacity Progress Bar -->
+        {% if event.total_capacity > 0 %}
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <small class="text-muted">Capacity</small>
+                <small class="text-muted">{{ event.total_tickets_sold }}/{{ event.total_capacity }}</small>
+            </div>
+            <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-primary" role="progressbar"
+                     style="width: {% if event.total_capacity > 0 %}{% widthratio event.total_tickets_sold event.total_capacity 100 %}{% else %}0{% endif %}%"></div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Rating Display -->
+        {% if event.review_count > 0 %}
+        <div class="mb-3">
+            <div class="d-flex align-items-center">
+                <div class="text-warning me-2">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= event.average_rating %}
+                            <i class="fas fa-star"></i>
+                        {% else %}
+                            <i class="far fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <small class="text-muted">{{ event.average_rating|floatformat:1 }} ({{ event.review_count }} review{{ event.review_count|pluralize }})</small>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="price-section">
+                {% if event.min_price == 0 %}
+                    <span class="h4 mb-0 text-success fw-bold">Free</span>
+                {% else %}
+                    <span class="h4 mb-0 text-primary fw-bold">From ${{ event.min_price }}</span>
+                {% endif %}
+                <div><small class="text-muted">per ticket</small></div>
+            </div>
+
+            <div class="action-buttons">
+                {% if event.is_sold_out %}
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-ban me-1"></i>Sold Out
+                    </button>
+                {% elif event.status != 'Active' %}
+                    <button class="btn btn-secondary" disabled>
+                        {{ event.status }}
+                    </button>
+                {% else %}
+                    <a href="{% url 'event_detail' event.pk %}" class="btn btn-primary shadow-sm">
+                        <i class="fas fa-ticket-alt me-1"></i>Book Now
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.event-card:hover img {
+    transform: scale(1.05);
+}
+
+.event-card:hover .position-absolute.top-0.start-0.w-100.h-100 {
+    opacity: 0.8 !important;
+}
+</style>

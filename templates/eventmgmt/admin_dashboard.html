@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4 text-center">Admin Dashboard</h2>
+  <ul class="nav nav-tabs mb-4" id="adminTab" role="tablist">
+    <li class="nav-item" role="presentation"><button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">Events</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" role="tab">Categories</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab">Bookings</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="subscriptions-tab" data-bs-toggle="tab" data-bs-target="#subscriptions" type="button" role="tab">Subscriptions</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets" type="button" role="tab">Tickets</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">Users</button></li>
+  </ul>
+  <div class="tab-content" id="adminTabContent">
+    <div class="tab-pane fade show active" id="events" role="tabpanel">
+      <h4>Add Event</h4>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ event_form.as_p }}
+        <button type="submit" name="add_event" class="btn btn-primary">Add Event</button>
+      </form>
+      <hr>
+      <h5>All Events</h5>
+      <ul>
+        {% for event in events %}
+          <li>{{ event.title }} ({{ event.date }})</li>
+        {% empty %}
+          <li>No events.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="tab-pane fade" id="categories" role="tabpanel">
+      <h4>Add Category</h4>
+      <form method="post">
+        {% csrf_token %}
+        {{ category_form.as_p }}
+        <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
+      </form>
+      <hr>
+      <h5>All Categories</h5>
+      <ul>
+        {% for cat in categories %}
+          <li>{{ cat.name }}</li>
+        {% empty %}
+          <li>No categories.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="tab-pane fade" id="bookings" role="tabpanel">
+      <h4>Add Booking</h4>
+      <form method="post">
+        {% csrf_token %}
+        {{ booking_form.as_p }}
+        <button type="submit" name="add_booking" class="btn btn-primary">Add Booking</button>
+      </form>
+      <hr>
+      <h5>All Bookings</h5>
+      <ul>
+        {% for booking in bookings %}
+          <li>{{ booking.user }} - {{ booking.ticket }} ({{ booking.status }})</li>
+        {% empty %}
+          <li>No bookings.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="tab-pane fade" id="reviews" role="tabpanel">
+      <h4>Add Review</h4>
+      <form method="post">
+        {% csrf_token %}
+        {{ review_form.as_p }}
+        <button type="submit" name="add_review" class="btn btn-primary">Add Review</button>
+      </form>
+      <hr>
+      <h5>All Reviews</h5>
+      <ul>
+        {% for review in reviews %}
+          <li>{{ review.booking }} - {{ review.rating }} stars</li>
+        {% empty %}
+          <li>No reviews.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="tab-pane fade" id="subscriptions" role="tabpanel">
+      <h4>Add Subscription</h4>
+      <form method="post">
+        {% csrf_token %}
+        {{ subscription_form.as_p }}
+        <button type="submit" name="add_subscription" class="btn btn-primary">Add Subscription</button>
+      </form>
+      <hr>
+      <h5>All Subscriptions</h5>
+      <ul>
+        {% for sub in subscriptions %}
+          <li>{{ sub.email }}</li>
+        {% empty %}
+          <li>No subscriptions.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="tab-pane fade" id="tickets" role="tabpanel">
+      <h4>Add Ticket</h4>
+      <form method="post">
+        {% csrf_token %}
+        {{ ticket_form.as_p }}
+        <button type="submit" name="add_ticket" class="btn btn-primary">Add Ticket</button>
+      </form>
+      <hr>
+      <h5>All Tickets</h5>
+      <ul>
+        {% for ticket in tickets %}
+          <li>{{ ticket.event }} - {{ ticket.ticket_type }} (${{ ticket.price }})</li>
+        {% empty %}
+          <li>No tickets.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="tab-pane fade" id="users" role="tabpanel">
+      <h4>Add User</h4>
+      <form method="post">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        <button type="submit" name="add_user" class="btn btn-primary">Add User</button>
+      </form>
+      <hr>
+      <h5>All Users</h5>
+      <ul>
+        {% for user in users %}
+          <li>{{ user.username }} ({{ user.email }})</li>
+        {% empty %}
+          <li>No users.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %} 

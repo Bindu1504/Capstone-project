@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings - EventFlow{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h1 class="fw-bold text-dark mb-2">
+                        <i class="fas fa-ticket-alt me-3 text-primary"></i>
+                        My Bookings
+                    </h1>
+                    <p class="text-muted mb-0">Manage your event bookings and tickets</p>
+                </div>
+                <a href="{% url 'event_list' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Book New Event
+                </a>
+            </div>
+            
+            {% if bookings %}
+                <!-- Bookings Stats -->
+                <div class="row g-4 mb-5">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white border-0">
+                            <div class="card-body text-center">
+                                <i class="fas fa-ticket-alt fa-2x mb-2"></i>
+                                <h3 class="fw-bold">{{ bookings.count }}</h3>
+                                <p class="mb-0">Total Bookings</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white border-0">
+                            <div class="card-body text-center">
+                                <i class="fas fa-check-circle fa-2x mb-2"></i>
+                                <h3 class="fw-bold">{{ confirmed_bookings }}</h3>
+                                <p class="mb-0">Confirmed</p>
+                            </div>
+                        </div>
+                    </div>
+{#                    <div class="col-md-3">#}
+{#                        <div class="card bg-warning text-white border-0">#}
+{#                            <div class="card-body text-center">#}
+{#                                <i class="fas fa-clock fa-2x mb-2"></i>#}
+{#                                <h3 class="fw-bold">#}
+{#                                    {% for booking in bookings %}#}
+{#                                        {% if booking.ticket.event.date >= today %}1{% endif %}#}
+{#                                    {% empty %}0{% endfor %}#}
+{#                                </h3>#}
+{#                                <p class="mb-0">Upcoming</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white border-0">
+                            <div class="card-body text-center">
+                                <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                <h3 class="fw-bold">${{ total_spent|floatformat:0 }}</h3>
+                                <p class="mb-0">Total Spent</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bookings List -->
+                <div class="row g-4">
+                    {% for booking in bookings %}
+                        <div class="col-lg-6">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body p-4">
+                                    <!-- Booking Header -->
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <h5 class="card-title fw-bold text-dark mb-0">
+                                            {{ booking.ticket.event.title }}
+                                        </h5>
+                                        <span class="badge bg-{% if booking.status == 'Confirmed' %}success{% elif booking.status == 'Pending' %}warning{% else %}danger{% endif %} px-3 py-2">
+                                            <i class="fas fa-{% if booking.status == 'Confirmed' %}check{% elif booking.status == 'Pending' %}clock{% else %}times{% endif %} me-1"></i>
+                                            {{ booking.status }}
+                                        </span>
+                                    </div>
+                                    
+{#                                    <!-- Event Image -->#}
+{#                                    <div class="mb-3">#}
+{#                                        <img src="{% if booking.ticket.event.image %}{{ booking.ticket.event.image }}{% else %}https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800{% endif %}" #}
+{#                                             class="img-fluid rounded" #}
+{#                                             alt="{{ booking.ticket.event.title }}" #}
+{#                                             style="height: 150px; width: 100%; object-fit: cover;">#}
+{#                                    </div>#}
+{#                                    #}
+                                    <!-- Event Details Grid -->
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center text-muted mb-2">
+                                                <i class="fas fa-calendar text-primary me-2"></i>
+                                                <div>
+                                                    <small class="d-block">Date</small>
+                                                    <strong class="text-dark">{{ booking.ticket.event.date|date:"M j, Y" }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center text-muted mb-2">
+                                                <i class="fas fa-clock text-primary me-2"></i>
+                                                <div>
+                                                    <small class="d-block">Time</small>
+                                                    <strong class="text-dark">{{ booking.ticket.event.time|time:"g:i A" }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center text-muted mb-2">
+                                                <i class="fas fa-ticket-alt text-primary me-2"></i>
+                                                <div>
+                                                    <small class="d-block">Ticket Type</small>
+                                                    <strong class="text-dark">{{ booking.ticket.ticket_type }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex align-items-center text-muted mb-2">
+                                                <i class="fas fa-hashtag text-primary me-2"></i>
+                                                <div>
+                                                    <small class="d-block">Quantity</small>
+                                                    <strong class="text-dark">{{ booking.quantity }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Location -->
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-start text-muted">
+                                            <i class="fas fa-map-marker-alt text-primary me-2 mt-1"></i>
+                                            <div>
+                                                <small class="d-block">Location</small>
+                                                <span class="text-dark">{{ booking.ticket.event.location }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Booking Info -->
+                                    <div class="bg-light p-3 rounded mb-3">
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Booking Reference</small>
+                                                <strong>{{ booking.booking_reference }}</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Total Paid</small>
+                                                <strong class="text-success">${{ booking.total_price }}</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Service Fee (5%)</small>
+                                                <strong>${{ booking.service_fee|floatformat:2 }} (5% of ${{ booking.ticket.price|floatformat:2 }} × {{ booking.quantity }})</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Booked On</small>
+                                                <strong>{{ booking.booking_date|date:"M j, Y" }}</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Organizer</small>
+                                                <strong>{{ booking.ticket.event.organizer_name }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'event_detail' booking.ticket.event.pk %}?viewonly=1"
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>
+                                            View Event
+                                        </a>
+
+                                        <div class="btn-group">
+                                            {% if booking.status == 'Confirmed' %}
+                                                <a href="{% url 'download_ticket' booking.id %}" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-download me-1"></i>
+                                                    Download Ticket
+                                                </a>
+                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle dropdown-toggle-split" 
+                                                        data-bs-toggle="dropdown">
+                                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    {% if not booking.review %}
+                                                    <li><a class="dropdown-item" href="{% url 'add_review' booking.id %}">
+                                                        <i class="fas fa-star me-2"></i>Add Review
+                                                    </a></li>
+                                                    {% endif %}
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <form method="post" action="{% url 'cancel_booking' booking.id %}" style="display:inline;" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="dropdown-item text-danger">
+                                                                <i class="fas fa-times me-2"></i>Cancel Booking
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            {% elif booking.status == 'Cancelled' %}
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Review Display -->
+                                    {% if booking.review %}
+                                    <div class="mt-3 p-3 bg-light rounded">
+                                        <h6 class="fw-bold mb-2">Your Review</h6>
+                                        <div class="text-warning mb-2">
+                                            {{ booking.review.star_display }}
+                                        </div>
+                                        {% if booking.review.comment %}
+                                        <p class="mb-0 text-muted small">{{ booking.review.comment }}</p>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-ticket-alt fa-5x text-muted opacity-50"></i>
+                    </div>
+                    <h4 class="text-muted mb-3">No bookings yet</h4>
+                    <p class="text-muted mb-4 lead">
+                        Start exploring amazing events and make your first booking!
+                    </p>
+                    <a href="{% url 'event_list' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-search me-2"></i>
+                        Browse Events
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+} */
+
+.badge {
+    font-size: 0.75rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Review - EventFlow{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                        <h2 class="fw-bold text-dark">Add Your Review</h2>
+                        <p class="text-muted">Share your experience with {{ booking.ticket.event.title }}</p>
+                    </div>
+                    
+                    <!-- Event Info -->
+                    <div class="bg-light p-4 rounded mb-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <img src="{% if booking.ticket.event.image %}{{ booking.ticket.event.image }}{% else %}https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800{% endif %}" 
+                                     class="img-fluid rounded" alt="{{ booking.ticket.event.title }}"
+                                     style="height: 100px; width: 100%; object-fit: cover;">
+                            </div>
+                            <div class="col-md-9">
+                                <h5 class="fw-bold mb-2">{{ booking.ticket.event.title }}</h5>
+                                <div class="row g-2">
+                                    <div class="col-sm-6">
+                                        <small class="text-muted d-block">Date</small>
+                                        <span>{{ booking.ticket.event.date|date:"M j, Y" }}</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <small class="text-muted d-block">Ticket Type</small>
+                                        <span>{{ booking.ticket.ticket_type }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Review Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Rating</label>
+                            <div class="rating-input">
+                                {% for value, label in form.rating.field.choices %}
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="rating" 
+                                           id="rating{{ value }}" value="{{ value }}" 
+                                           {% if form.rating.value == value %}checked{% endif %}>
+                                    <label class="form-check-label" for="rating{{ value }}">
+                                        <span class="rating-stars" data-rating="{{ value }}">
+                                            {% for i in "12345" %}
+                                                <i class="fas fa-star {% if forloop.counter <= value %}text-warning{% else %}text-muted{% endif %}"></i>
+                                            {% endfor %}
+                                        </span>
+                                        <span class="ms-2">{{ label }}</span>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Your Review</label>
+                            {{ form.comment }}
+                            <div class="form-text">Share your thoughts about the event, organization, venue, etc.</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'my_bookings' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.rating-input .form-check {
+    margin-bottom: 1rem;
+}
+
+.rating-input .form-check-label {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.rating-input .form-check-label:hover {
+    background-color: #f8f9fa;
+}
+
+.rating-input .form-check-input:checked + .form-check-label {
+    background-color: #e3f2fd;
+}
+
+.rating-stars {
+    font-size: 1.2rem;
+}
+</style>
+{% endblock %}

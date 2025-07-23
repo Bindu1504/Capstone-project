@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }} - EventFlow{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-5">
+        <!-- Event Details Column -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="position-relative">
+{#                    <img src="{% if event.image %}{{ event.image }}{% else %}https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800{% endif %}" #}
+{#                         class="card-img-top" alt="{{ event.title }}" #}
+{#                         style="height: 400px; object-fit: cover;">#}
+                    
+                    <!-- Event Status Overlay -->
+{#                    <div class="position-absolute top-0 start-0 m-3">#}
+{#                        {% if event.featured %}#}
+{#                            <span class="badge bg-warning text-dark me-2 px-3 py-2">#}
+{#                                <i class="fas fa-star me-1"></i>Featured#}
+{#                            </span>#}
+{#                        {% endif %}#}
+{#                        <span class="badge bg-primary px-3 py-2">#}
+{#                            {{ event.get_category_display }}#}
+{#                        </span>#}
+{#                        {% if event.status != 'Active' %}#}
+{#                            <span class="badge bg-secondary px-3 py-2 ms-2">#}
+{#                                {{ event.status }}#}
+{#                            </span>#}
+{#                        {% endif %}#}
+{#                    </div>#}
+                    
+                    {% if event.is_almost_full %}
+                        <div class="position-absolute bottom-0 start-0 end-0 m-3">
+                            <div class="alert alert-warning mb-0 py-2 px-3">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Only {{ event.available_spots }} spots remaining!
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h1 class="card-title fw-bold text-dark">{{ event.title }}</h1>
+                        <div class="text-end">
+                            {% if event.min_price == 0 %}
+                                <span class="h3 text-success fw-bold">Free</span>
+                            {% else %}
+                                <span class="h3 text-primary fw-bold">From ${{ event.min_price }}</span>
+                            {% endif %}
+                            <div><small class="text-muted">per ticket</small></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Event Info Grid -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="info-card bg-light p-3 rounded">
+                                <h6 class="fw-bold text-primary mb-2">
+                                    <i class="fas fa-calendar me-2"></i>Date & Time
+                                </h6>
+                                <p class="mb-1 fw-semibold">{{ event.date|date:"l, F j, Y" }}</p>
+                                <p class="mb-0 text-muted">{{ event.time|time:"g:i A" }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-card bg-light p-3 rounded">
+                                <h6 class="fw-bold text-primary mb-2">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Location
+                                </h6>
+                                <p class="mb-0">{{ event.location }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-card bg-light p-3 rounded">
+                                <h6 class="fw-bold text-primary mb-2">
+                                    <i class="fas fa-user me-2"></i>Organizer
+                                </h6>
+                                <p class="mb-0">{{ event.organizer_name }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-card bg-light p-3 rounded">
+                                <h6 class="fw-bold text-primary mb-2">
+                                    <i class="fas fa-users me-2"></i>Capacity
+                                </h6>
+                                <p class="mb-1">{{ event.total_tickets_sold }} / {{ event.total_capacity }} registered</p>
+                                {% if event.total_capacity > 0 %}
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" 
+                                         style="width: {% widthratio event.total_tickets_sold event.total_capacity 100 %}%"></div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="fas fa-info-circle me-2"></i>About This Event
+                        </h6>
+                        <p class="card-text lh-lg">{{ event.description }}</p>
+                    </div>
+                    
+                    <!-- Available Tickets -->
+                    {% if available_tickets %}
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="fas fa-ticket-alt me-2"></i>Available Tickets
+                        </h6>
+                        <div class="row g-3">
+                            {% for ticket in available_tickets %}
+                            <div class="col-md-6">
+                                <div class="card border">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="fw-bold mb-0">{{ ticket.ticket_type }}</h6>
+                                            <span class="h5 text-primary fw-bold mb-0">${{ ticket.price }}</span>
+                                        </div>
+                                        {% if ticket.description %}
+                                        <p class="text-muted small mb-2">{{ ticket.description }}</p>
+                                        {% endif %}
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">{{ ticket.available_qty }} available</small>
+                                            <div class="progress flex-grow-1 mx-2" style="height: 4px;">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     style="width: {% widthratio ticket.sold_quantity ticket.total_quantity 100 %}%"></div>
+                                            </div>
+                                            <small class="text-muted">{{ ticket.sold_quantity }} sold</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Reviews Section -->
+                    {% if reviews %}
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="fas fa-star me-2"></i>Recent Reviews
+                        </h6>
+                        {% for review in reviews %}
+                        <div class="card border-0 bg-light mb-3">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-circle p-2 me-3">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ review.booking.user.get_full_name|default:review.booking.user.username }}</h6>
+                                            <div class="text-warning">
+                                                {{ review.star_display }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ review.review_date|date:"M j, Y" }}</small>
+                                </div>
+                                {% if review.comment %}
+                                <p class="mb-0 text-muted">{{ review.comment }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Booking Column -->
+        {% if show_booking %}
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 " style="top: 2rem;">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold mb-4">
+                        <i class="fas fa-credit-card me-2 text-primary"></i>
+                        Book This Event
+                    </h5>
+                    <p class="mb-3 text-muted">To book tickets, please select a ticket type and quantity, then click the <strong>Book</strong> button. You must be logged in to book tickets.</p>
+                    {% if not user.is_authenticated %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You must be <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">logged in</a> to book tickets.
+                        </div>
+                    {% elif event.is_sold_out %}
+                        <div class="alert alert-danger text-center">
+                            <i class="fas fa-ban fa-2x mb-3"></i>
+                            <h6 class="fw-bold">Event Sold Out</h6>
+                            <p class="mb-0">This event has reached maximum capacity</p>
+                        </div>
+                        <button class="btn btn-secondary w-100" disabled>
+                            <i class="fas fa-ban me-2"></i>Sold Out
+                        </button>
+                    {% elif event.status != 'Active' %}
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-pause fa-2x mb-3"></i>
+                            <h6 class="fw-bold">Event {{ event.status }}</h6>
+                            <p class="mb-0">This event is currently {{ event.status|lower }}</p>
+                        </div>
+                        <button class="btn btn-secondary w-100" disabled>
+                            {{ event.status }}
+                        </button>
+                    {% else %}
+                        <form method="post" action="{% url 'book_event' event.pk %}" id="bookingForm">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Select Event</label>
+                                {{ booking_form.ticket }}
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Number of Tickets</label>
+                                {{ booking_form.quantity }}
+                                <small class="form-text text-muted" id="availability-info">
+                                    Select the Event to see availability
+                                </small>
+                            </div>
+                            <div class="bg-light p-4 rounded mb-4" id="payment-summary" style="display: none;">
+                                <h6 class="fw-bold mb-3">Payment Summary</h6>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Ticket Price:</span>
+                                    <span id="ticket-price">$0.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Quantity:</span>
+                                    <span id="quantity-display">1</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Subtotal:</span>
+                                    <span id="subtotal-display">$0.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Service Fee:</span>
+                                    <span id="fee-display">$2.50</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between fw-bold h5">
+                                    <span>Total:</span>
+                                    <span id="total-display" class="text-primary">$2.50</span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 btn-lg shadow-sm" id="book-btn" disabled>
+                                <i class="fas fa-ticket-alt me-2"></i>
+                                Select Event
+                            </button>
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Secure payment processing
+                                </small>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Event Organizer Info -->
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-user-tie me-2 text-primary"></i>
+                        Event Organizer
+                    </h6>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="fas fa-user fa-lg text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">{{ event.organizer_name }}</h6>
+                            <small class="text-muted">Event Organizer</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ticketSelect = document.getElementById('ticket-select');
+    const quantityInput = document.getElementById('quantity-input');
+    const paymentSummary = document.getElementById('payment-summary');
+    const bookBtn = document.getElementById('book-btn');
+    const availabilityInfo = document.getElementById('availability-info');
+    
+    function updatePricing() {
+        const selectedTicket = ticketSelect.value;
+        const quantity = parseInt(quantityInput.value) || 1;
+        
+        if (selectedTicket) {
+            // Get ticket info via AJAX
+            fetch(`/api/ticket-info/?ticket_id=${selectedTicket}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        const price = data.price;
+                        const subtotal = quantity * price;
+                        const serviceFee = 2.50;
+                        const total = subtotal + serviceFee;
+                        
+                        document.getElementById('ticket-price').textContent = '$' + price.toFixed(2);
+                        document.getElementById('quantity-display').textContent = quantity;
+                        document.getElementById('subtotal-display').textContent = '$' + subtotal.toFixed(2);
+                        document.getElementById('total-display').textContent = '$' + total.toFixed(2);
+                        
+                        availabilityInfo.textContent = `${data.available_qty} tickets available`;
+                        quantityInput.max = Math.min(10, data.available_qty);
+                        
+                        paymentSummary.style.display = 'block';
+                        bookBtn.disabled = false;
+                        bookBtn.innerHTML = '<i class="fas fa-ticket-alt me-2"></i>Book';
+                    }
+                });
+        } else {
+            paymentSummary.style.display = 'none';
+            bookBtn.disabled = true;
+            bookBtn.innerHTML = '<i class="fas fa-ticket-alt me-2"></i>Book';
+            availabilityInfo.textContent = 'Select a ticket type to see availability';
+        }
+    }
+    
+    ticketSelect.addEventListener('change', updatePricing);
+    quantityInput.addEventListener('change', updatePricing);
+    quantityInput.addEventListener('input', updatePricing);
+});
+</script>
+{% endblock %}
